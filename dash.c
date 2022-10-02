@@ -250,7 +250,12 @@ int main(int argc, char** argv)
         char *l = NULL;
         size_t len =0;
         ssize_t lsize =0;
-        lsize = getline(&l, &len, stdin);
+        FILE *input = stdin;
+        if(argc == 2)
+        {
+            input = fopen(argv[1], "r");
+        }
+        lsize = getline(&l, &len, input);
         char *temp = l;
         char *str;
         int parallel_cmds;
