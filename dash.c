@@ -107,6 +107,7 @@ void CheckPath(char* pathchecker[], int data2)
 {
     int q = 0;
     char temp4[30];
+    printf("%s\n", pathchecker[1]);
     //pathchecker[1] = NULL;
     while(1)
     {
@@ -118,14 +119,13 @@ void CheckPath(char* pathchecker[], int data2)
         {
             int id1 = fork();
             if(id1 == 0)
-            {
+            {   
             strcpy(temp4, c[q]);
             strcat(temp4, "/");
             strcat(temp4, pathchecker[0]);
             int acc = access(temp4, X_OK);
             if(acc == 0)
             {
-                strcpy(pathchecker[0], temp4);
                 if(checkrdr == 1)
                 {
                   int fd;
@@ -134,7 +134,7 @@ void CheckPath(char* pathchecker[], int data2)
                   dup2(fd, STDERR_FILENO);
                   close(fd);
                 }
-                execv(pathchecker[0], pathchecker);
+                execv(temp4, pathchecker);
             } 
             else
             {
@@ -170,9 +170,6 @@ void findpath(char* d[], int data3)
 }
 int LoopFunc(char *sting)
 {
-    char *f[0];
-    f[0] = "/bin";  
-    findpath(f, 1);
     char *l2 =  strdup(sting);
     l3 = getredirection(l2);
     char *arr = sting;
@@ -250,17 +247,16 @@ int main(int argc, char** argv)
         char *l = NULL;
         size_t len =0;
         ssize_t lsize =0;
-        FILE *input = stdin;
-        if(argc == 2)
-        {
-            input = fopen(argv[1], "r");
-        }
-        lsize = getline(&l, &len, input);
+        lsize = getline(&l, &len, stdin);
         char *temp = l;
         char *str;
         int parallel_cmds;
+        char *f[0];
+        f[0] = "/bin";  
+        findpath(f, 1);
         for(parallel_cmds = 0; (str = strtok_r(temp, "&", &temp)); parallel_cmds++)
         {
+            printf("%s\n", str);
             if(parallel_cmds == 0)
             {
                 int check = LoopFunc(str);
