@@ -49,6 +49,11 @@
 // 3. "Dash> " will be reached
 // 4. all the commands can be tested in this shell
 
+// TYPES of modes available:
+
+//1. Interactive Mode  - using "dash" executable we can run the interactive mode by passing on commands one by one.
+//2. Batch Mode - Program was made in such a way that the if the commands are entered in a batch way, we can if check and execute
+//    all at once using (argc, argv).
 // ------------------------------------------------------------------------------------------------------------------------------
 
 //header files
@@ -58,14 +63,18 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <fcntl.h>
-char* c[20];
+
+// global variables
+char* c[20]; // declaring a array to store the path here.
 char* temp3[20];
 char* args[100];
 char* copy[100];
-int checkrdr;
-char* l3;
+int checkrdr; // declaring a variable here to return if there is a redirection.
+char* l3; // declaring a variable here to store the redirection output file.
 char error_message[30] = "An error has occurred\n";
-int tokeinzer(char* array)
+
+//Functions
+int tokeinzer(char* array) // Description(.1)
 {
     int i =0;
     while (1) 
@@ -80,9 +89,8 @@ int tokeinzer(char* array)
     args[i] = NULL;
     return i;
 }
-char* getredirection(char* strng)
+char* getredirection(char* strng) // Description(.2)
 {
-    int z = 0;
     char *new;
     new = strtok(strng, ">");
     new = strtok(NULL, ">");
@@ -92,7 +100,7 @@ char* getredirection(char* strng)
     }
     return new;  
 }
-int TrailChecker(char* strng)
+int TrailChecker(char* strng) // Description(.3)
 {
    int i = 0;
    char* parse  = strtok(strng, " ");
@@ -103,11 +111,10 @@ int TrailChecker(char* strng)
    }
    return i;
 }
-void CheckPath(char* pathchecker[], int data2)
+void CheckPath(char* pathchecker[], int data2) // Description(.4)
 {
     int q = 0;
     char temp4[30];
-    printf("%s\n", pathchecker[1]);
     //pathchecker[1] = NULL;
     while(1)
     {
@@ -117,7 +124,7 @@ void CheckPath(char* pathchecker[], int data2)
         }
         else
         {
-            int id1 = fork();
+            int id1 = fork(); // creating a process using fork system call
             if(id1 == 0)
             {   
             strcpy(temp4, c[q]);
@@ -129,7 +136,7 @@ void CheckPath(char* pathchecker[], int data2)
                 if(checkrdr == 1)
                 {
                   int fd;
-                  fd = open(l3, O_TRUNC | O_CREAT | O_RDWR, S_IRWXU);
+                  fd = open(l3, O_TRUNC | O_CREAT | O_RDWR, S_IRWXU); // fd stores the file descriptor value, O_TRUNC overwrites a given file, O_CREAT creates file if filename doesn't exist
                   dup2(fd, STDOUT_FILENO);
                   dup2(fd, STDERR_FILENO);
                   close(fd);
@@ -138,7 +145,7 @@ void CheckPath(char* pathchecker[], int data2)
             } 
             else
             {
-                write(STDERR_FILENO, error_message, strlen(error_message));
+                write(STDERR_FILENO, error_message, strlen(error_message)); //prints an error message
             }
             }
             else
@@ -150,7 +157,7 @@ void CheckPath(char* pathchecker[], int data2)
         q++;
     }
 }
-void findpath(char* d[], int data3)
+void findpath(char* d[], int data3) // Description(.5)
 {
    int j=0;
    while(j<data3)
@@ -164,11 +171,11 @@ void findpath(char* d[], int data3)
     {
       c[j] =(char *) malloc(strlen(d[j]) + 1);
       strcpy(c[j], d[j]);
-    }
+    } 
     j++;
    }
 }
-int LoopFunc(char *sting)
+int LoopFunc(char *sting) // Description(.6)
 {
     char *l2 =  strdup(sting);
     l3 = getredirection(l2);
@@ -180,10 +187,10 @@ int LoopFunc(char *sting)
         int space = TrailChecker(l3);
         if(space > 1)
         {
-            write(STDERR_FILENO, error_message, strlen(error_message));
+            write(STDERR_FILENO, error_message, strlen(error_message));   //prints an error message
+            return 0;
         }
-    }  
-    int o;     
+    }       
     if(strcmp(args[0], "cd") == 0 || strcmp(args[0], "exit") == 0 || strcmp(args[0], "path") == 0 )
         {
            if(strcmp("cd",args[0]) == 0 || strcmp("cd\n", args[0]) == 0) 
@@ -191,19 +198,19 @@ int LoopFunc(char *sting)
             char* directory = args[1];
             if(i == 1)
             {
-                write(STDERR_FILENO, error_message, strlen(error_message));
+                write(STDERR_FILENO, error_message, strlen(error_message)); //prints an error message
             }
             else if(i == 2)
             {
-               int ch = chdir(directory);
-               if(ch == -1)
+               int ch = chdir(directory); // to check whether we could able to access the directory or even if it exists or not.
+               if(ch == -1) 
                {
-                   write(STDERR_FILENO, error_message, strlen(error_message));
+                   write(STDERR_FILENO, error_message, strlen(error_message)); //prints an error message
                }
             }
             else
             {
-               write(STDERR_FILENO, error_message, strlen(error_message));
+               write(STDERR_FILENO, error_message, strlen(error_message)); //prints an error message
             }
            }
          else if(strcmp("exit", args[0]) == 0 || strcmp("exit\n", args[0]) == 0)
@@ -214,7 +221,7 @@ int LoopFunc(char *sting)
             }
             else
             {
-                write(STDERR_FILENO, error_message, strlen(error_message));
+                write(STDERR_FILENO, error_message, strlen(error_message)); //prints an error message
             }
           }
           else if(strcmp("path", args[0]) == 0 || strcmp("path\n", args[0]) == 0 )
@@ -224,7 +231,7 @@ int LoopFunc(char *sting)
         }
     else 
     {
-        int proc2 = fork();
+        int proc2 = fork(); // creating a process using fork system call
         if(proc2 == 0)
         {
             CheckPath(args, i);
@@ -237,9 +244,18 @@ int LoopFunc(char *sting)
     }  
   return 0;
 }
+
+//main function
 int main(int argc, char** argv)
 {
+    if(argc > 2)
+    {
+        write(STDERR_FILENO, error_message, strlen(error_message)); //prints an error message
+        exit(0);
+    }
 
+    if(argc == 1) //INTERACTIVE MODE
+    {
     while(1)
     {
         char a[]= "dash> ";
@@ -247,16 +263,19 @@ int main(int argc, char** argv)
         char *l = NULL;
         size_t len =0;
         ssize_t lsize =0;
-        lsize = getline(&l, &len, stdin);
+        lsize = getline(&l, &len, stdin); //here getline function is used to receive input from the user.
+        if(lsize == -1)
+        {
+            exit(0);
+        }
         char *temp = l;
         char *str;
         int parallel_cmds;
         char *f[0];
         f[0] = "/bin";  
         findpath(f, 1);
-        for(parallel_cmds = 0; (str = strtok_r(temp, "&", &temp)); parallel_cmds++)
+        for(parallel_cmds = 0; (str = strtok_r(temp, "&", &temp)); parallel_cmds++) // loop to check for parallel commands, here we are tokenizing string using '&' delimiter and sending each command indiviually to a function to execute the function
         {
-            printf("%s\n", str);
             if(parallel_cmds == 0)
             {
                 int check = LoopFunc(str);
@@ -267,8 +286,61 @@ int main(int argc, char** argv)
             }
             else
             {
-               int proc = fork();
+               int proc = fork(); // creating a process using fork system call
                if(proc == 0)
+               {
+                 LoopFunc(str);
+                 exit(0);
+               }
+            }
+        }
+        if(parallel_cmds > 1)
+        {
+            while(parallel_cmds > 0)
+            {
+                wait(NULL); 
+                parallel_cmds = parallel_cmds - 1;
+            }
+        }
+    }
+
+    }
+    
+    else if(argc == 2) // checking the arguments if it is batch mode or not. ((BATCH MODE))
+    {
+        char *l = NULL;
+        size_t len =0;
+        ssize_t lsize =0;
+        FILE *input = stdin;
+        if(argc == 2)
+        {
+            input = fopen(argv[1], "r");
+        }
+        lsize = getline(&l, &len, input);
+        if(lsize == -1)
+        {
+            exit(0);
+        }
+        char *temp = l;
+        char *str;
+        int parallel_cmds;
+        char *f[0];
+        f[0] = "/bin";  
+        findpath(f, 1);
+        for(parallel_cmds = 0; (str = strtok_r(temp, "&", &temp)); parallel_cmds++) // loop to check for parallel commands, here we are tokenizing string using '&' delimiter and sending each command indiviually to a function to execute the function
+        {
+            if(parallel_cmds == 0)
+            {
+                int check = LoopFunc(str);
+                if(check == -1)
+                {
+                    exit(0);
+                }
+            }
+            else
+            {
+               int proc = fork(); // creating a process using fork system call
+               if(proc == 0) // CHILD PROCESS
                {
                  LoopFunc(str);
                  exit(0);
@@ -283,6 +355,7 @@ int main(int argc, char** argv)
                 parallel_cmds = parallel_cmds - 1;
             }
         }
+        
     }
     return 0;
 }
