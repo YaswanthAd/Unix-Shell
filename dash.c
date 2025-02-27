@@ -35,10 +35,8 @@
 // Team member contributions (though all of us worked together for all the modules, main contributions have been listed below): 
 
 // 1) Yaswanth Adari
-//    NET ID: YXA220006
 
-// 2) Sai Pavan Goud Addla
-//    NET ID: SXA210294
+// 2) Surya Siva Pranav Jakka
 
 // ------------------------------------------------------------------------------------------------------------------------------
 
